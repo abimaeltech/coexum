@@ -2,12 +2,12 @@ from setuptools import setup, find_packages
 
 setup(
     name="coexum",
-    version="0.1.0",
+    version="0.1.0-rc1",
     description="Rede descentralizada de IA - Potiguar AI Lab",
     packages=find_packages(exclude=['tests', 'docs']),
     entry_points={
         'console_scripts': [
-            'coexum=agent.cli:main',
+            'coexum=agent.cli:cli',
         ],
     },
     install_requires=[
