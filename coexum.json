@@ -1,0 +1,7 @@
+{
+  "node_id": "",
+  "api_port": 8000,
+  "p2p_port": 9000,
+  "registry_url": "https://registry.coexum.org",
+  "blockchain_rpc": "https://polygon-rpc.com"
+}
