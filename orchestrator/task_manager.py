@@ -1,8 +1,19 @@
 """
-Gerencia o ciclo de vida das tarefas distribuídas.
+Gerencia a distribuição de jobs entre nós ativos (stub).
 """
-def submit_task(task):
-    print(f"Tarefa submetida: {task}")
+import time
+from orchestrator.node_registry import get_active_nodes
+from orchestrator.network import send_task
 
-def get_task_status(task_id):
-    return {"task_id": task_id, "status": "pending"}
+def dispatch_tasks():
+    nodes = get_active_nodes()
+    print(f"✅ Dispatching {len(nodes)} task(s) to {len(nodes)} node(s)")
+    for node in nodes:
+        # Exemplo de payload
+        task = {
+            'task_id': f"task_{int(time.time())}",
+            'type': 'inference',
+            'model': 'tinyllm',
+            'prompt': 'Olá, Coexum!'
+        }
+        send_task(node, task)

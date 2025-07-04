@@ -1,11 +1,101 @@
- README.md
+README.md
 
 ````markdown
 # Coexum
-Rede descentralizada de IA do Potiguar AI Lab Research.
 
-## 🚀 Visão Geral
-Coexum permite formar um cluster P2P de dispositivos heterogêneos (Windows, Linux, macOS) para executar treinamento e inferência de modelos de IA distribuídos, democratizando acesso à computação de alto desempenho.
+## 🚀 Quickstart
+
+```bash
+# 1) Clone o repositório
+git clone https://github.com/abimaeltech/coexum.git
+cd coexum
+
+# 2) Crie e ative um virtualenv
+python -m venv .venv
+source .venv/bin/activate  # Linux/macOS
+.venv\Scripts\Activate     # Windows
+
+# 3) Instale em modo editable
+pip install -e .
+
+# 4) Registre um nó de exemplo
+coexum node start
+
+# 5) Inicie o scheduler
+coexum scheduler
+
+# 6) Rode o dashboard (http://localhost:8000)
+coexum dashboard serve
+
+# 7) Teste a API no Swagger UI
+open http://localhost:8000/docs
+```
+
+## 4. Docker & Docker-Compose
+### Dockerfile do Dashboard
+```dockerfile
+FROM python:3.12-slim
+WORKDIR /app
+COPY . .
+RUN pip install -e .
+EXPOSE 8000
+CMD ["coexum","dashboard","serve","--host","0.0.0.0"]
+```
+
+docker-compose.yml
+```yaml
+version: "3.8"
+services:
+  dashboard:
+    build: .
+    ports:
+      - "8000:8000"
+  scheduler:
+    build: .
+    command: coexum scheduler
+  node:
+    build: .
+    command: coexum node start
+```
+
+Coloque esses arquivos na raiz e documente no README.
+
+## 5. CI/CD básico com GitHub Actions
+Crie `.github/workflows/ci.yml`:
+
+```yaml
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with: python-version: 3.12
+      - name: Install deps
+        run: |
+          python -m venv .venv
+          source .venv/bin/activate
+          pip install -e .[test]
+      - name: Run lint
+        run: flake8 .
+      - name: Run tests
+        run: pytest --maxfail=1 --disable-warnings -q
+```
+
+## 6. Publicação no PyPI
+Configure `~/.pypirc` com suas credenciais PyPI.
+
+Gere sdist/wheel e faça upload com twine:
+
+```bash
+python setup.py sdist bdist_wheel
+twine upload dist/*
+```
 
 ---
 

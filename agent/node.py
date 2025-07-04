@@ -14,3 +14,7 @@ def start_node():
         metrics = collect_metrics()
         report_heartbeat(node_id, metrics)
         time.sleep(HEARTBEAT_INTERVAL)
+
+def stop_node():
+    """Stub: para o nó Coexum (não implementado)."""
+    print("Nó Coexum parado (stub)")

@@ -1,0 +1,14 @@
+fastapi
+uvicorn
+typer
+psutil
+websockets
+requests
+web3
+docker
+pydantic
+pydantic-settings
+python-jose[cryptography]
+passlib[bcrypt]
+python-multipart
+PyJWT

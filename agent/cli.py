@@ -1,30 +1,54 @@
 import typer
-from agent.node import start_node
-from dashboard.api.main import serve_dashboard
+from agent.node import start_node, stop_node  # supondo que existam
 from orchestrator.scheduler import schedule_jobs
+from dashboard.api.main import app as dashboard_app  # FastAPI app
 
-app = typer.Typer(help="CLI do Coexum: gerencie nós e dashboard")
+cli = typer.Typer()
+node_app = typer.Typer()
+dashboard_cli = typer.Typer()
+scheduler_app = typer.Typer()
 
-@app.command()
-def node(action: str = typer.Argument(..., help="start|stop")):
-    """Controla o ciclo de vida do nó Coexum"""
-    if action == 'start':
-        start_node()
-    else:
-        typer.secho("Ação não suportada.", fg=typer.colors.RED)
+cli.add_typer(node_app, name="node")
+cli.add_typer(dashboard_cli, name="dashboard")
+cli.add_typer(scheduler_app, name="scheduler")
 
-@app.command()
-def dashboard():
-    """Inicia o dashboard web"""
-    serve_dashboard()
+@node_app.command("start")
+def node_start():
+    """Inicia um nó Coexum (envia heartbeat)."""
+    start_node()
 
-@app.command()
+@node_app.command("stop")
+def node_stop():
+    """Para o nó Coexum."""
+    stop_node()
+
+@scheduler_app.callback(invoke_without_command=True)
 def scheduler():
-    """Executa o orquestrador de tarefas"""
+    """Executa o orquestrador de tarefas."""
     schedule_jobs()
 
-def main():
-    app()
+@dashboard_cli.command("serve")
+def dashboard_serve():
+    """
+    Inicia o dashboard web (FastAPI + Uvicorn).
+    """
+    import uvicorn
+    # Executa o FastAPI app definido em dashboard/api/main.py
+    uvicorn.run(
+        dashboard_app,
+        host="0.0.0.0",
+        port=8000,
+        log_level="info",
+    )
 
-if __name__ == '__main__':
-    main()
+@dashboard_cli.command("front")
+def dashboard_front():
+    """
+    Inicia o frontend React (Vite + Tailwind) em modo dev.
+    """
+    import subprocess, os
+    cwd = os.path.join(os.getcwd(), "dashboard", "frontend")
+    subprocess.run("npm run dev", cwd=cwd, check=True, shell=True)
+
+if __name__ == "__main__":
+    cli()

@@ -1,0 +1,37 @@
+services:
+  backend:
+    build:
+      context: ./backend
+    container_name: coexum-backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app       # código Python
+      - ./frontend/dist:/app/static/assets  # build estático
+    environment:
+      - API_PORT=8000
+      - P2P_PORT=9000
+      - REGISTRY_URL=http://backend:8000
+      - SCHEDULE_INTERVAL=30
+
+  scheduler:
+    build:
+      context: ./backend
+    container_name: coexum-scheduler
+    depends_on:
+      - backend
+    command: ["coexum", "scheduler"]
+    environment:
+      - REGISTRY_URL=http://backend:8000
+
+  node:
+    build:
+      context: ./backend
+    container_name: coexum-node
+    depends_on:
+      - backend
+    command: ["coexum", "node", "start"]
+    environment:
+      - REGISTRY_URL=http://backend:8000
+
+# (Opcional) Grafana/Prometheus podem ser adicionados aqui num futuro stage
